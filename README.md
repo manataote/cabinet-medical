@@ -1,46 +1,265 @@
-# Getting Started with Create React App
+# Cabinet Médical - Application de Gestion
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Une application web moderne pour la gestion complète d'un cabinet médical, développée avec React, TypeScript et Tailwind CSS.
 
-## Available Scripts
+## 🚀 Fonctionnalités
 
-In the project directory, you can run:
+### 📊 Tableau de bord
+- Vue d'ensemble des statistiques du cabinet
+- Graphiques et métriques en temps réel
+- Actions récentes et notifications
 
-### `npm start`
+### 👥 Gestion des patients
+- Création et modification de dossiers patients
+- Informations personnelles et médicales
+- Historique des consultations
+- Gestion des assurés
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### 📋 Feuilles de soins
+- Création de feuilles de soins complètes
+- Gestion des actes médicaux
+- Calcul automatique des montants
+- Conditions particulières (ATMP, maternité, urgence, etc.)
+- Parcours de soins coordonnés
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### 💰 Factures semelles orthopédiques
+- Création de factures pour semelles
+- Gestion des articles et références
+- Calcul automatique TVA et montants
+- Gestion des pointures et latéralités
 
-### `npm test`
+### 📄 Bordereaux de remise
+- Création de bordereaux de remise
+- Regroupement de feuilles de soins
+- Calcul automatique des totaux
+- Numérotation automatique
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 🎨 Éditeur de modèles
+- Création de modèles personnalisés
+- Éditeur visuel drag & drop
+- Zones d'impression configurables
+- Prévisualisation en temps réel
 
-### `npm run build`
+### ⚙️ Paramètres
+- Configuration de l'application
+- Gestion des prestations
+- Sauvegarde et restauration des données
+- Export/Import des données
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🛠️ Technologies utilisées
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- **Frontend**: React 19, TypeScript
+- **Styling**: Tailwind CSS 4
+- **État global**: Context API + useReducer
+- **Formulaires**: React Hook Form + Yup
+- **PDF**: React PDF
+- **Animations**: Framer Motion
+- **Drag & Drop**: React DnD
+- **Tests**: Jest + React Testing Library
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 📦 Installation
 
-### `npm run eject`
+1. **Cloner le repository**
+   ```bash
+   git clone <repository-url>
+   cd cabinet-medical
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+2. **Installer les dépendances**
+   ```bash
+   npm install
+   ```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+3. **Démarrer l'application**
+   ```bash
+   npm start
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+4. **Ouvrir dans le navigateur**
+   ```
+   http://localhost:3000
+   ```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## 🏗️ Structure du projet
 
-## Learn More
+```
+src/
+├── components/           # Composants React
+│   ├── patients/        # Gestion des patients
+│   ├── feuillesSoins/   # Feuilles de soins
+│   ├── factures/        # Factures semelles
+│   ├── bordereaux/      # Bordereaux de remise
+│   ├── editor/          # Éditeur de modèles
+│   └── ...
+├── contexts/            # Contextes React
+│   └── AppContext.tsx   # État global de l'application
+├── types/               # Définitions TypeScript
+│   └── index.ts         # Types principaux
+├── utils/               # Utilitaires
+│   ├── calculs.ts       # Calculs médicaux
+│   ├── storage.ts       # Gestion du stockage
+│   └── validation.ts    # Validation des données
+└── ...
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 📋 Types de données
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Patient
+```typescript
+interface Patient {
+  id: string;
+  numeroFacture: string;
+  nom: string;
+  prenom: string;
+  dn: string; // 7 chiffres
+  dateNaissance: Date;
+  adresse: string;
+  telephone: string;
+  assure?: Patient; // Patient assuré
+}
+```
+
+### Feuille de soins
+```typescript
+interface FeuilleSoins {
+  id: string;
+  numeroFacture: string;
+  patient: Patient;
+  assure?: Patient;
+  parcoursSoins: boolean;
+  accordPrealable?: string;
+  medecinPrescripteur: string;
+  datePrescription: Date;
+  conditions: {
+    longueMaladie: boolean;
+    atmp: boolean;
+    numeroAtp?: string;
+    maternite: boolean;
+    urgence: boolean;
+  };
+  actes: Acte[];
+  montantTotal: number;
+  montantPaye: number;
+  montantTiersPayant: number;
+  modeleUtilise: string;
+}
+```
+
+### Facture semelles
+```typescript
+interface FactureSemelles {
+  id: string;
+  numeroFacture: string;
+  patient: Patient;
+  articles: ArticleSemelles[];
+  tva: number;
+  montantHT: number;
+  montantTTC: number;
+  modeleUtilise: string;
+}
+```
+
+### Bordereau
+```typescript
+interface Bordereau {
+  id: string;
+  numeroBordereau: string;
+  date: Date;
+  feuillesSoins: FeuilleSoins[];
+  montantTotal: number;
+  modeleUtilise: string;
+}
+```
+
+## 🔧 Configuration
+
+### Variables d'environnement
+Créez un fichier `.env` à la racine du projet :
+
+```env
+REACT_APP_API_URL=http://localhost:3001
+REACT_APP_VERSION=1.0.0
+```
+
+### Configuration Tailwind
+Le fichier `tailwind.config.js` contient la configuration personnalisée avec :
+- Couleurs primaires et médicales
+- Police Inter
+- Extensions personnalisées
+
+## 📱 Fonctionnalités avancées
+
+### Sauvegarde automatique
+- Sauvegarde automatique dans le localStorage
+- Export/Import des données en JSON
+- Synchronisation en temps réel
+
+### Calculs automatiques
+- Calcul des montants des feuilles de soins
+- Calcul des TVA pour les factures
+- Calcul des totaux des bordereaux
+- Gestion des majorations (dimanche, nuit)
+
+### Validation des données
+- Validation des numéros de sécurité sociale
+- Validation des montants
+- Validation des dates
+- Messages d'erreur personnalisés
+
+### Interface utilisateur
+- Design responsive
+- Animations fluides
+- Thème médical professionnel
+- Accessibilité optimisée
+
+## 🧪 Tests
+
+```bash
+# Lancer les tests
+npm test
+
+# Lancer les tests en mode watch
+npm test -- --watch
+
+# Générer un rapport de couverture
+npm test -- --coverage
+```
+
+## 📦 Build de production
+
+```bash
+# Construire l'application
+npm run build
+
+# Prévisualiser le build
+npx serve -s build
+```
+
+## 🤝 Contribution
+
+1. Fork le projet
+2. Créer une branche feature (`git checkout -b feature/AmazingFeature`)
+3. Commit les changements (`git commit -m 'Add some AmazingFeature'`)
+4. Push vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrir une Pull Request
+
+## 📄 Licence
+
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+
+## 🆘 Support
+
+Pour toute question ou problème :
+- Ouvrir une issue sur GitHub
+- Consulter la documentation
+- Contacter l'équipe de développement
+
+## 🔄 Versions
+
+- **v1.0.0** : Version initiale avec toutes les fonctionnalités de base
+- **v1.1.0** : Ajout de l'éditeur de modèles
+- **v1.2.0** : Amélioration des calculs et de la validation
+
+---
+
+Développé avec ❤️ pour les professionnels de santé
