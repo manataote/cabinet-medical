@@ -10,12 +10,12 @@ export class CalculUtils {
     majorationNuit: number = 0.0,
     majorationDimanche: number = 0.0
   ): number {
-    // Calculer le montant de base à partir du coefficient et du tarif
+    // Calculer le montant de base (le tarif, SANS multiplier par le coefficient)
     let montant = 0;
     
     if (tarif) {
-      // Utiliser le tarif fourni en paramètre
-      montant = tarif * acte.coefficient;
+      // Utiliser le tarif fourni en paramètre (le coefficient est juste une info, pas un multiplicateur)
+      montant = tarif;
     } else if (acte.montant) {
       // Fallback: utiliser acte.montant si le tarif n'est pas fourni
       montant = acte.montant;

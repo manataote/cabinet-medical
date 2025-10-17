@@ -293,7 +293,7 @@ const FeuilleSoinsForm: React.FC<FeuilleSoinsFormProps> = ({ onBack, feuille }) 
       ik: undefined,
       majorationDimanche: false,
       majorationNuit: false,
-      montant: template.tarif * template.coefficient,
+      montant: template.tarif, // Le montant est le tarif, sans multiplier par le coefficient
       medecinPrescripteur: formData.medecinPrescripteur || '',
     };
 
@@ -322,7 +322,7 @@ const FeuilleSoinsForm: React.FC<FeuilleSoinsFormProps> = ({ onBack, feuille }) 
             // Chercher dans les actes de soins
             const acteSoinsTemplate = state.actesSoins?.find(t => t.code === acte.lettreCle);
             if (acteSoinsTemplate) {
-              updatedActe.montant = acteSoinsTemplate.tarif * updatedActe.coefficient;
+              updatedActe.montant = acteSoinsTemplate.tarif; // Le montant est le tarif, sans multiplier par le coefficient
             } else {
               // Chercher dans les actes orthopédiques
               const acteOrthoTemplate = state.actesOrthopediques?.find(t => t.codeLPPR === acte.lettreCle);
@@ -332,7 +332,7 @@ const FeuilleSoinsForm: React.FC<FeuilleSoinsFormProps> = ({ onBack, feuille }) 
                 // Fallback vers l'ancien système si nécessaire
                 const template = state.acteTemplates.find(t => t.lettreCle === acte.lettreCle);
                 if (template) {
-                  updatedActe.montant = template.tarif * updatedActe.coefficient;
+                  updatedActe.montant = template.tarif; // Le montant est le tarif, sans multiplier par le coefficient
                 }
               }
             }
