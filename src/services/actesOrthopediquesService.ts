@@ -2,12 +2,23 @@ import { supabase } from '../config/supabase';
 import { ActeOrthopedique } from '../types';
 
 export class ActesOrthopediquesService {
-  // Récupérer tous les actes orthopédiques
-  static async getActesOrthopediques(): Promise<ActeOrthopedique[]> {
-    const { data, error } = await supabase
+  // Récupérer tous les actes orthopédiques (globaux + cabinet)
+  static async getActesOrthopediques(cabinetId?: string | null): Promise<ActeOrthopedique[]> {
+    let query = supabase
       .from('actes_orthopediques')
-      .select('*')
-      .order('code_lppr', { ascending: true });
+      .select('*');
+
+    // Filtrer pour afficher :
+    // 1. Les actes globaux (cabinet_id IS NULL)
+    // 2. Les actes du cabinet actuel (si cabinetId fourni)
+    if (cabinetId) {
+      query = query.or(`cabinet_id.is.null,cabinet_id.eq.${cabinetId}`);
+    } else {
+      // Si pas de cabinetId, afficher seulement les actes globaux
+      query = query.is('cabinet_id', null);
+    }
+
+    const { data, error } = await query.order('code_lppr', { ascending: true });
 
     if (error) {
       console.error('Erreur lors de la récupération des actes orthopédiques:', error);
@@ -32,7 +43,7 @@ export class ActesOrthopediquesService {
   }
 
   // Créer un nouvel acte orthopédique
-  static async createActeOrthopedique(acte: Omit<ActeOrthopedique, 'id'>): Promise<ActeOrthopedique> {
+  static async createActeOrthopedique(acte: Omit<ActeOrthopedique, 'id'>, cabinetId?: string | null): Promise<ActeOrthopedique> {
 
     const { data, error } = await supabase
       .from('actes_orthopediques')
@@ -49,6 +60,7 @@ export class ActesOrthopediquesService {
         part_cps: acte.partCPS,
         part_patient: acte.partPatient,
         actif: acte.actif,
+        cabinet_id: cabinetId || null, // Associer au cabinet ou laisser global (NULL)
       })
       .select()
       .single();

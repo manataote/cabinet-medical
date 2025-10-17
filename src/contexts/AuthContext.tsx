@@ -120,25 +120,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (error) throw error;
 
       if (data.user) {
-        // Récupérer l'ID du cabinet par défaut
-        const { data: cabinetData, error: cabinetError } = await supabase
-          .from('cabinets')
-          .select('id')
-          .eq('name', 'Cabinet Médical')
-          .single();
+        // Créer l'enregistrement utilisateur dans la base de données SANS cabinet_id
+        // L'utilisateur devra choisir son cabinet à la première connexion
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert({
+            id: data.user.id,
+            email: data.user.email!,
+            nom: nom || '',
+            prenom: prenom || '',
+            role,
+            cabinet_id: null, // Pas de cabinet assigné à l'inscription
+          });
 
-        if (cabinetData && !cabinetError) {
-          // Créer l'enregistrement utilisateur dans la base de données
-          await supabase
-            .from('users')
-            .insert({
-              id: data.user.id,
-              email: data.user.email!,
-              nom: nom || '',
-              prenom: prenom || '',
-              role,
-              cabinet_id: cabinetData.id,
-            });
+        if (insertError) {
+          console.error('Erreur lors de la création du profil utilisateur:', insertError);
+          throw insertError;
         }
       }
     } catch (err: any) {

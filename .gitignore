@@ -11,6 +11,15 @@
 # production
 /build
 
+# electron
+/dist
+/out
+*.exe
+*.dmg
+*.AppImage
+*.deb
+*.snap
+
 # misc
 .DS_Store
 .env.local

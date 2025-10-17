@@ -17,11 +17,7 @@ import BordereauForm from './bordereaux/BordereauForm';
 import MedecinList from './medecins/MedecinList';
 import MedecinForm from './medecins/MedecinForm';
 import { ActesSepares } from './actes/ActesSepares';
-import { ActesMigration } from './admin/ActesMigration';
-import DataMigrationComponent from './admin/DataMigration';
 import DuplicatesCleanupComponent from './admin/DuplicatesCleanup';
-import InitTestData from './admin/InitTestData';
-import FixPatientData from './admin/FixPatientData';
 
 import Settings from './Settings';
 import { Medecin, Patient, FeuilleSoins, Bordereau, FactureSemelles } from '../types';
@@ -170,16 +166,8 @@ const Layout: React.FC = () => {
 
       case 'actes':
         return <ActesSepares onBack={() => setCurrentView('dashboard')} />;
-      case 'actes-migration':
-        return <ActesMigration />;
-      case 'data-migration':
-        return <DataMigrationComponent />;
       case 'cleanup-duplicates':
         return <DuplicatesCleanupComponent />;
-      case 'init-test-data':
-        return <InitTestData />;
-      case 'fix-patient-data':
-        return <FixPatientData />;
       case 'settings':
         return <Settings />;
       default:
@@ -211,14 +199,8 @@ const Layout: React.FC = () => {
         return 'Médecins prescripteurs';
       case 'medecin-form':
         return selectedMedecin ? 'Modifier le médecin' : 'Nouveau médecin';
-      case 'data-migration':
-        return 'Migration des données';
       case 'cleanup-duplicates':
         return 'Nettoyage des doublons';
-      case 'init-test-data':
-        return 'Données de test';
-      case 'fix-patient-data':
-        return 'Correction données patients';
       case 'settings':
         return 'Paramètres';
       default:

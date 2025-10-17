@@ -1032,7 +1032,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // Fonctions pour les actes de soins
   const addActeSoins = async (acte: ActeSoins) => {
     try {
-      const newActe = await ActesSoinsService.createActeSoins(acte);
+      const cabinetId = state.userInfo?.cabinet_id || state.cabinetInfo?.id;
+      const newActe = await ActesSoinsService.createActeSoins(acte, cabinetId);
       dispatch({ type: 'ADD_ACTE_SOINS', payload: newActe });
     } catch (error) {
       console.error('Erreur lors de la création de l\'acte de soins:', error);
@@ -1063,7 +1064,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // Fonctions pour les actes orthopédiques
   const addActeOrthopedique = async (acte: ActeOrthopedique) => {
     try {
-      const newActe = await ActesOrthopediquesService.createActeOrthopedique(acte);
+      const cabinetId = state.userInfo?.cabinet_id || state.cabinetInfo?.id;
+      const newActe = await ActesOrthopediquesService.createActeOrthopedique(acte, cabinetId);
       dispatch({ type: 'ADD_ACTE_ORTHOPEDIQUE', payload: newActe });
     } catch (error) {
       console.error('Erreur lors de la création de l\'acte orthopédique:', error);
@@ -1498,8 +1500,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       const [patientsCount, medecins, actesSoins, actesOrthopediques, feuillesSoins, facturesSemelles, bordereaux, todos, ordonnances, cabinetInfo, userInfo] = await Promise.allSettled([
         withTimeout(PatientsService.getPatientsCount()),
         withTimeout(MedecinsService.getMedecins()),
-        withTimeout(ActesSoinsService.getActesSoins()),
-        withTimeout(ActesOrthopediquesService.getActesOrthopediques()),
+        withTimeout(ActesSoinsService.getActesSoins(userData.cabinet_id)), // Passer le cabinet_id
+        withTimeout(ActesOrthopediquesService.getActesOrthopediques(userData.cabinet_id)), // Passer le cabinet_id
         withTimeout(FeuillesSoinsService.getFeuillesSoins(userData.cabinet_id)),
         withTimeout(FacturesSemellesService.getFacturesSemelles(userData.cabinet_id)),
         withTimeout(BordereauxService.getBordereaux(userData.cabinet_id)),

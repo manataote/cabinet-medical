@@ -14,10 +14,6 @@ export type CurrentView =
   | 'medecins'
   | 'medecin-form'
   | 'actes'
-  | 'actes-migration'
-  | 'data-migration'
   | 'cleanup-duplicates'
-  | 'init-test-data'
-  | 'fix-patient-data'
   | 'settings'
   | 'auth'; 

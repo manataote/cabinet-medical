@@ -31,6 +31,50 @@ export class CabinetService {
     }
   }
 
+  static async getAllCabinets(): Promise<Cabinet[]> {
+    try {
+      const { data, error } = await supabase
+        .from('cabinets')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) {
+        console.error('Erreur lors de la récupération des cabinets:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Erreur lors de la récupération des cabinets:', error);
+      return [];
+    }
+  }
+
+  static async createCabinet(name: string, address?: string, phone?: string, email?: string): Promise<Cabinet | null> {
+    try {
+      const { data, error } = await supabase
+        .from('cabinets')
+        .insert({
+          name,
+          address,
+          phone,
+          email,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erreur lors de la création du cabinet:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Erreur lors de la création du cabinet:', error);
+      return null;
+    }
+  }
+
   static async updateCabinet(cabinetId: string, updates: Partial<Cabinet>): Promise<Cabinet | null> {
     try {
       const { data, error } = await supabase

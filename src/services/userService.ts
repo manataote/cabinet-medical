@@ -157,4 +157,43 @@ export class UserService {
       return null;
     }
   }
+
+  static async linkUserToCabinet(userId: string, cabinetId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ cabinet_id: cabinetId })
+        .eq('id', userId);
+
+      if (error) {
+        console.error('Erreur lors de la liaison de l\'utilisateur au cabinet:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Erreur lors de la liaison de l\'utilisateur au cabinet:', error);
+      return false;
+    }
+  }
+
+  static async checkUserHasCabinet(userId: string): Promise<boolean> {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('cabinet_id')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Erreur lors de la vérification du cabinet de l\'utilisateur:', error);
+        return false;
+      }
+
+      return !!data?.cabinet_id;
+    } catch (error) {
+      console.error('Erreur lors de la vérification du cabinet de l\'utilisateur:', error);
+      return false;
+    }
+  }
 }

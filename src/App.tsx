@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { AppProvider, useApp } from './contexts/AppContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { UserService } from './services/userService';
 import Layout from './components/Layout';
 import HomePage from './components/HomePage';
+import CabinetSelection from './components/CabinetSelection';
 import './index.css';
 
 // Composant qui utilise le contexte App
@@ -29,10 +31,29 @@ const AuthContent: React.FC = () => {
   const { user, loading: authLoading } = useAuth();
   const { loadInitialData, isLoading: dataLoading } = useApp();
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [hasCabinet, setHasCabinet] = useState<boolean | null>(null);
+  const [checkingCabinet, setCheckingCabinet] = useState(true);
 
-  // Charger les données une fois que l'utilisateur est connecté
+  // Vérifier si l'utilisateur a un cabinet assigné
   useEffect(() => {
-    if (user && !dataLoaded && !dataLoading) {
+    const checkUserCabinet = async () => {
+      if (user) {
+        setCheckingCabinet(true);
+        const hasAssignedCabinet = await UserService.checkUserHasCabinet(user.id);
+        setHasCabinet(hasAssignedCabinet);
+        setCheckingCabinet(false);
+      } else {
+        setHasCabinet(null);
+        setCheckingCabinet(false);
+      }
+    };
+
+    checkUserCabinet();
+  }, [user]);
+
+  // Charger les données une fois que l'utilisateur est connecté ET a un cabinet
+  useEffect(() => {
+    if (user && hasCabinet && !dataLoaded && !dataLoading) {
       console.log('🔄 Début du chargement des données Supabase...');
       loadInitialData().then(() => {
         console.log('✅ Données Supabase chargées avec succès');
@@ -42,22 +63,23 @@ const AuthContent: React.FC = () => {
         setDataLoaded(true); // Marquer comme chargé même en cas d'erreur
       });
     }
-  }, [user, dataLoaded, dataLoading, loadInitialData]);
+  }, [user, hasCabinet, dataLoaded, dataLoading, loadInitialData]);
 
-  // Afficher un loader pendant le chargement de l'authentification ou des données
-  if (authLoading || (user && !dataLoaded)) {
+  // Callback après sélection du cabinet
+  const handleCabinetSelected = () => {
+    setHasCabinet(true);
+    setDataLoaded(false); // Forcer le rechargement des données avec le nouveau cabinet
+  };
+
+  // Afficher un loader pendant le chargement de l'authentification ou de la vérification du cabinet
+  if (authLoading || checkingCabinet) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">
-            {authLoading ? 'Vérification de l\'authentification...' : 'Chargement des données...'}
+            {authLoading ? 'Vérification de l\'authentification...' : 'Vérification du profil...'}
           </p>
-          {user && dataLoading && (
-            <p className="mt-2 text-sm text-gray-500">
-              Récupération des données...
-            </p>
-          )}
         </div>
       </div>
     );
@@ -68,7 +90,29 @@ const AuthContent: React.FC = () => {
     return <HomePage />;
   }
 
-  // Si l'utilisateur est connecté et les données sont chargées, afficher l'application
+  // Si l'utilisateur est connecté mais n'a pas de cabinet, afficher la sélection de cabinet
+  if (hasCabinet === false) {
+    return <CabinetSelection onCabinetSelected={handleCabinetSelected} />;
+  }
+
+  // Afficher un loader pendant le chargement des données
+  if (user && hasCabinet && !dataLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Chargement des données...</p>
+          {dataLoading && (
+            <p className="mt-2 text-sm text-gray-500">
+              Récupération des données...
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Si l'utilisateur est connecté, a un cabinet et les données sont chargées, afficher l'application
   return <AppWithContext />;
 };
 

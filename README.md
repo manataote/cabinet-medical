@@ -56,6 +56,7 @@ Une application web moderne pour la gestion complète d'un cabinet médical, dé
 - **Animations**: Framer Motion
 - **Drag & Drop**: React DnD
 - **Tests**: Jest + React Testing Library
+- **Desktop**: Electron (application native multi-plateforme)
 
 ## 📦 Installation
 
@@ -71,13 +72,16 @@ Une application web moderne pour la gestion complète d'un cabinet médical, dé
    ```
 
 3. **Démarrer l'application**
+
+   **Version Web:**
    ```bash
    npm start
    ```
+   Puis ouvrir http://localhost:3000
 
-4. **Ouvrir dans le navigateur**
-   ```
-   http://localhost:3000
+   **Version Electron (application desktop):**
+   ```bash
+   npm run electron-dev
    ```
 
 ## 🏗️ Structure du projet
@@ -227,13 +231,58 @@ npm test -- --coverage
 
 ## 📦 Build de production
 
+### Build Web
 ```bash
-# Construire l'application
+# Construire l'application web
 npm run build
 
 # Prévisualiser le build
 npx serve -s build
 ```
+
+### Build Electron (Application Desktop)
+
+```bash
+# Build pour Windows
+npm run electron-build-win
+
+# Build pour macOS
+npm run electron-build-mac
+
+# Build pour Linux
+npm run electron-build-linux
+
+# Build pour toutes les plateformes
+npm run electron-build-all
+```
+
+Les fichiers d'installation seront générés dans le dossier `dist/` :
+- **Windows** : `Cabinet Médical-Setup-0.1.0.exe` (installeur) et `Cabinet Médical-Portable-0.1.0.exe` (portable)
+- **macOS** : `Cabinet Médical-0.1.0.dmg` et `.zip`
+- **Linux** : `Cabinet Médical-0.1.0.AppImage` et `.deb`
+
+## 🖥️ Application Desktop (Electron)
+
+L'application peut être empaquetée en tant qu'application desktop native grâce à Electron.
+
+### Avantages de la version desktop
+- ✅ Fonctionne hors ligne
+- ✅ Application autonome (pas besoin de navigateur)
+- ✅ Icône dans la barre des tâches
+- ✅ Meilleure intégration système
+- ✅ Distribution facile via installeur
+
+### Configuration Electron
+- **Main process**: `public/electron.js` - Gestion de la fenêtre et des événements système
+- **Preload script**: `public/preload.js` - Pont sécurisé entre l'application et Electron
+- **Configuration build**: Dans `package.json` sous la clé `"build"`
+
+### Sécurité
+L'application suit les meilleures pratiques de sécurité Electron :
+- ✅ Context Isolation activé
+- ✅ Node Integration désactivé
+- ✅ Remote Module désactivé
+- ✅ Preload script pour l'exposition contrôlée des APIs
 
 ## 🤝 Contribution
 

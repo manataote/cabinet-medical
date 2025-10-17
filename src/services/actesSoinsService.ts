@@ -2,12 +2,23 @@ import { supabase } from '../config/supabase';
 import { ActeSoins } from '../types';
 
 export class ActesSoinsService {
-  // Récupérer tous les actes de soins
-  static async getActesSoins(): Promise<ActeSoins[]> {
-    const { data, error } = await supabase
+  // Récupérer tous les actes de soins (globaux + cabinet)
+  static async getActesSoins(cabinetId?: string | null): Promise<ActeSoins[]> {
+    let query = supabase
       .from('actes_soins')
-      .select('*')
-      .order('code', { ascending: true });
+      .select('*');
+
+    // Filtrer pour afficher :
+    // 1. Les actes globaux (cabinet_id IS NULL)
+    // 2. Les actes du cabinet actuel (si cabinetId fourni)
+    if (cabinetId) {
+      query = query.or(`cabinet_id.is.null,cabinet_id.eq.${cabinetId}`);
+    } else {
+      // Si pas de cabinetId, afficher seulement les actes globaux
+      query = query.is('cabinet_id', null);
+    }
+
+    const { data, error } = await query.order('code', { ascending: true });
 
     if (error) {
       console.error('Erreur lors de la récupération des actes de soins:', error);
@@ -25,7 +36,7 @@ export class ActesSoinsService {
   }
 
   // Créer un nouvel acte de soins
-  static async createActeSoins(acte: Omit<ActeSoins, 'id'>): Promise<ActeSoins> {
+  static async createActeSoins(acte: Omit<ActeSoins, 'id'>, cabinetId?: string | null): Promise<ActeSoins> {
 
     const { data, error } = await supabase
       .from('actes_soins')
@@ -35,6 +46,7 @@ export class ActesSoinsService {
         tarif: acte.tarif,
         coefficient: acte.coefficient,
         actif: acte.actif,
+        cabinet_id: cabinetId || null, // Associer au cabinet ou laisser global (NULL)
       })
       .select()
       .single();
